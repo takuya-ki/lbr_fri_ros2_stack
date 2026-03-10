@@ -1,3 +1,5 @@
 .vscode
 **/__pycache__
 COLCON_IGNORE
+.claude/
+CLAUDE.md

@@ -1,2 +1,6 @@
-# dont forget to chmod +x container_new_console.sh 
-docker exec -it lbr_stack_container bash
+#!/bin/bash
+set -e
+
+CONTAINER_NAME="lbr_stack_container"
+
+docker exec -it "${CONTAINER_NAME}" bash

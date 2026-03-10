@@ -1,4 +1,8 @@
-# dont forget to chmod +x container_new_console.sh 
-xhost + 
+#!/bin/bash
+set -e
 
-docker start lbr_stack_container -i
+CONTAINER_NAME="lbr_stack_container"
+
+xhost +local:docker
+
+docker start "${CONTAINER_NAME}" -i
