@@ -24,7 +24,6 @@
         <xacro:macro name="gazebo_joint_reference" params="name">
             <gazebo reference="${name}">
                 <implicitSpringDamper>true</implicitSpringDamper>
-                <provideFeedback>true</provideFeedback>
             </gazebo>
         </xacro:macro>
 
