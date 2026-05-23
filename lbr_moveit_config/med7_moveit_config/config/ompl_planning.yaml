@@ -1,0 +1,78 @@
+planning_plugin: ompl_interface/OMPLPlanner
+request_adapters: default_planner_request_adapters/AddTimeOptimalParameterization
+  default_planner_request_adapters/ResolveConstraintFrames default_planner_request_adapters/FixWorkspaceBounds
+  default_planner_request_adapters/FixStartStateBounds default_planner_request_adapters/FixStartStateCollision
+  default_planner_request_adapters/FixStartStatePathConstraints
+start_state_max_bounds_error: 0.1
+jiggle_fraction: 0.05
+planner_configs:
+  ESTkConfigDefault:
+    type: geometric::EST
+    range: 0.0
+    goal_bias: 0.05
+  RRTkConfigDefault:
+    type: geometric::RRT
+    range: 0.0
+    goal_bias: 0.05
+  RRTConnectkConfigDefault:
+    type: geometric::RRTConnect
+    range: 0.0
+  RRTstarkConfigDefault:
+    type: geometric::RRTstar
+    range: 0.0
+    goal_bias: 0.05
+    delay_collision_checking: 1
+  TRRTkConfigDefault:
+    type: geometric::TRRT
+    range: 0.0
+    goal_bias: 0.05
+    max_states_failed: 10
+    temp_change_factor: 2.0
+    min_temperature: 1.0e-10
+    init_temperature: 1.0e-06
+    frountier_threshold: 0.0
+    frountierNodeRatio: 0.1
+    k_constant: 0.0
+  PRMkConfigDefault:
+    type: geometric::PRM
+    max_nearest_neighbors: 10
+  PRMstarkConfigDefault:
+    type: geometric::PRMstar
+  BiTRRTkConfigDefault:
+    type: geometric::BiTRRT
+    range: 0.0
+    temp_change_factor: 0.1
+    init_temperature: 100
+    frountier_threshold: 0.0
+    frountier_node_ratio: 0.1
+    cost_threshold: 1.0e300
+  LBTRRTkConfigDefault:
+    type: geometric::LBTRRT
+    range: 0.0
+    goal_bias: 0.05
+    epsilon: 0.4
+  BiESTkConfigDefault:
+    type: geometric::BiEST
+    range: 0.0
+  LazyPRMstarkConfigDefault:
+    type: geometric::LazyPRMstar
+  SPARSkConfigDefault:
+    type: geometric::SPARS
+    stretch_factor: 3.0
+    sparse_delta_fraction: 0.25
+    dense_delta_fraction: 0.001
+    max_failures: 1000
+arm:
+  planner_configs:
+  - ESTkConfigDefault
+  - RRTkConfigDefault
+  - RRTConnectkConfigDefault
+  - RRTstarkConfigDefault
+  - TRRTkConfigDefault
+  - PRMkConfigDefault
+  - PRMstarkConfigDefault
+  - BiTRRTkConfigDefault
+  - LBTRRTkConfigDefault
+  - BiESTkConfigDefault
+  - LazyPRMstarkConfigDefault
+  - SPARSkConfigDefault

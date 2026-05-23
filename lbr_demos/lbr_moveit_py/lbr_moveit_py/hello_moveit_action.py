@@ -18,6 +18,23 @@ from std_msgs.msg import Header
 
 
 class MoveGroupActionClientNode(Node):
+    PLANNING_PIPELINE_ID = "ompl"
+    PLANNER_ID = "RRTConnectkConfigDefault"
+    PLANNER_ID_OPTIONS = (
+        "ESTkConfigDefault",
+        "RRTkConfigDefault",
+        "RRTConnectkConfigDefault",
+        "RRTstarkConfigDefault",
+        "TRRTkConfigDefault",
+        "PRMkConfigDefault",
+        "PRMstarkConfigDefault",
+        "BiTRRTkConfigDefault",
+        "LBTRRTkConfigDefault",
+        "BiESTkConfigDefault",
+        "LazyPRMstarkConfigDefault",
+        "SPARSkConfigDefault",
+    )
+
     def __init__(self, node_name: str) -> None:
         super().__init__(node_name)
 
@@ -70,6 +87,23 @@ class MoveGroupActionClientNode(Node):
         goal.request.max_acceleration_scaling_factor = 0.1
         goal.request.max_velocity_scaling_factor = 0.1
         goal.request.num_planning_attempts = 1
+        goal.request.pipeline_id = self.PLANNING_PIPELINE_ID
+        # planner_id options registered in ompl_planning.yaml:
+        # ESTkConfigDefault, RRTkConfigDefault, RRTConnectkConfigDefault,
+        # RRTstarkConfigDefault, TRRTkConfigDefault, PRMkConfigDefault,
+        # PRMstarkConfigDefault, BiTRRTkConfigDefault, LBTRRTkConfigDefault,
+        # BiESTkConfigDefault, LazyPRMstarkConfigDefault, SPARSkConfigDefault
+        goal.request.planner_id = self.PLANNER_ID
+
+        self.get_logger().info(
+            f"Available OMPL planner_ids: {', '.join(self.PLANNER_ID_OPTIONS)}"
+        )
+        self.get_logger().info(
+            "Sending MoveGroup goal with "
+            f"pipeline_id='{goal.request.pipeline_id}', "
+            f"planner_id='{goal.request.planner_id}', "
+            f"group_name='{goal.request.group_name}'"
+        )
 
         return self.move_group_action_client.send_goal_async(goal)
 
