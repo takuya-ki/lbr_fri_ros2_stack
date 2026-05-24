@@ -21,7 +21,10 @@ def generate_launch_description() -> LaunchDescription:
         DeclareLaunchArgument(
             name="keyboard_config",
             default_value="config/forward_keyboard.yaml",
-            description="Location of the keyboard configuration file relative to keyboard_config_pkg.",
+            description=(
+                "Location of the keyboard configuration file relative to "
+                "keyboard_config_pkg."
+            ),
         )
     )
     ld.add_action(LBRDescriptionMixin.arg_robot_name())

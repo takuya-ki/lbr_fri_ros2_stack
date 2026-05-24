@@ -10,16 +10,19 @@ class KeyboardListener:
         self._key_listener = Listener(
             on_press=self._on_key_press, on_release=self._on_key_release
         )
-        self._valid_numbers = None
+        self._valid_numbers = "".join(
+            [str(i) for i in self._command_forward_node.keyboard_layout.joints]
+        )
         self._twist_cmd = np.zeros(6)
-        self._joint_velocity_cmd = None
+        self._joint_velocity_cmd = np.zeros(self._command_forward_node.dof)
         self._joint_vel_direction = 1.0
 
     def __enter__(self):
         self._key_listener.start()
+        return self
 
     def __exit__(self, exc_type, exc_value, traceback):
-        self._command_forward_node.get_logger().info("Exiting keyboard listener with.")
+        self._command_forward_node.get_logger().info("Exiting keyboard listener.")
         self._key_listener.stop()
 
     def _on_key_release(self, key: Key) -> None:
@@ -95,9 +98,11 @@ class KeyboardListener:
                 if 0 <= index < self._command_forward_node.dof:
                     self._joint_velocity_cmd[index] = 0.0
             self._command_forward_node.twist_cmd = self._twist_cmd
-            self._command_forward_node.joint_veloctiy_cmd = self._joint_velocity_cmd
-        except AttributeError:
-            pass
+            self._command_forward_node.joint_velocity_cmd = self._joint_velocity_cmd
+        except AttributeError as exc:
+            self._command_forward_node.get_logger().warning(
+                f"Ignoring key release before keyboard state is ready: {exc}"
+            )
 
     def _on_key_press(self, key: Key) -> None:
         key_str = str(key).replace("'", "")
@@ -106,15 +111,10 @@ class KeyboardListener:
             self._twist_cmd = np.zeros(6)
             self._joint_velocity_cmd = np.zeros(self._command_forward_node.dof)
             self._command_forward_node.twist_cmd = self._twist_cmd
-            self._command_forward_node.joint_veloctiy_cmd = self._joint_velocity_cmd
+            self._command_forward_node.joint_velocity_cmd = self._joint_velocity_cmd
             self._key_listener.stop()
         if not self._command_forward_node.dof:
             return
-        if not self._valid_numbers:
-            self._valid_numbers = "".join(
-                [str(i) for i in self._command_forward_node.keyboard_layout.joints]
-            )
-            self._joint_velocity_cmd = np.zeros(self._command_forward_node.dof)
         try:
             if (
                 key_str
@@ -187,6 +187,8 @@ class KeyboardListener:
                 if 0 <= index < self._command_forward_node.dof:
                     self._joint_velocity_cmd[index] = self._joint_vel_direction
             self._command_forward_node.twist_cmd = self._twist_cmd
-            self._command_forward_node.joint_veloctiy_cmd = self._joint_velocity_cmd
-        except AttributeError:
-            pass
+            self._command_forward_node.joint_velocity_cmd = self._joint_velocity_cmd
+        except AttributeError as exc:
+            self._command_forward_node.get_logger().warning(
+                f"Ignoring key press before keyboard state is ready: {exc}"
+            )

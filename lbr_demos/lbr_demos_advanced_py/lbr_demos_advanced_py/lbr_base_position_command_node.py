@@ -8,8 +8,10 @@ from lbr_fri_idl.msg import LBRJointPositionCommand, LBRState
 
 
 class LBRBasePositionCommandNode(Node):
-    r"""Utility class for creating a base node for sending position commands to the KUKA LBRs.
-    Retrieves update rate and robot description from the parameter servers.
+    r"""
+    Base node for sending position commands to the KUKA LBRs.
+
+    Retrieves update rate and robot description from parameter servers.
     """
 
     _update_rate: int

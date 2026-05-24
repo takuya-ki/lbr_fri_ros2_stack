@@ -63,6 +63,7 @@ planner_configs:
     dense_delta_fraction: 0.001
     max_failures: 1000
 arm:
+  default_planner_config: RRTConnectkConfigDefault
   planner_configs:
   - ESTkConfigDefault
   - RRTkConfigDefault

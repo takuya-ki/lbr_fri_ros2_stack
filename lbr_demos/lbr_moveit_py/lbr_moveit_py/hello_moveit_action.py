@@ -7,6 +7,7 @@ from moveit_msgs.action import MoveGroup
 from moveit_msgs.msg import (
     BoundingVolume,
     Constraints,
+    MoveItErrorCodes,
     OrientationConstraint,
     PositionConstraint,
 )
@@ -17,6 +18,7 @@ from std_msgs.msg import Header
 
 
 class MoveGroupActionClientNode(Node):
+    ACTION_SERVER_TIMEOUT_SEC = 10.0
     PLANNING_PIPELINE_ID = "ompl"
     # Supported planner_id values registered in ompl_planning.yaml:
     PLANNER_ID_OPTIONS = (
@@ -61,7 +63,9 @@ class MoveGroupActionClientNode(Node):
         )
 
         self.get_logger().info(f"Waiting for action server {self.action_server}...")
-        if not self.move_group_action_client.wait_for_server(timeout_sec=1):
+        if not self.move_group_action_client.wait_for_server(
+            timeout_sec=self.ACTION_SERVER_TIMEOUT_SEC
+        ):
             raise RuntimeError(
                 f"Couldn't connect to action server {self.action_server}."
             )
@@ -124,22 +128,41 @@ class MoveGroupActionClientNode(Node):
 
         return self.move_group_action_client.send_goal_async(goal)
 
+    def move_to_pose(self, target: Pose) -> None:
+        goal_future = self.send_goal_async(target)
+        rclpy.spin_until_future_complete(self, goal_future)
+        goal_handle = goal_future.result()
+        if goal_handle is None or not goal_handle.accepted:
+            raise RuntimeError("MoveGroup goal was rejected.")
+
+        self.get_logger().info("MoveGroup goal accepted. Waiting for result...")
+        result_future = goal_handle.get_result_async()
+        rclpy.spin_until_future_complete(self, result_future)
+        action_result = result_future.result()
+        if action_result is None:
+            raise RuntimeError("MoveGroup action returned no result.")
+
+        error_code = action_result.result.error_code.val
+        if error_code != MoveItErrorCodes.SUCCESS:
+            raise RuntimeError(f"MoveGroup action failed with error code {error_code}.")
+        self.get_logger().info("MoveGroup action succeeded.")
+
 
 def main(args: List = None) -> None:
     rclpy.init(args=args)
-    node = MoveGroupActionClientNode("hello_moveit_action")
-
-    # Note that this is in the robot coordinate system
-    pose = Pose(
-        position=Point(x=0.0, y=0.0, z=1.0),
-        orientation=Quaternion(x=0.0, y=0.0, z=0.0, w=1.0),
-    )
-    future = node.send_goal_async(pose)
-    rclpy.spin_until_future_complete(
-        node, future
-    )  # gets stuck for invalid goals
-
-    rclpy.shutdown()
+    node = None
+    try:
+        node = MoveGroupActionClientNode("hello_moveit_action")
+        target_pose = Pose(
+            position=Point(x=0.0, y=0.0, z=1.0),
+            orientation=Quaternion(x=0.0, y=0.0, z=0.0, w=1.0),
+        )
+        node.move_to_pose(target_pose)
+    finally:
+        if node is not None:
+            node.destroy_node()
+        if rclpy.ok():
+            rclpy.shutdown()
 
 
 if __name__ == "__main__":
