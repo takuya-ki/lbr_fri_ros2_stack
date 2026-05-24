@@ -1,4 +1,3 @@
-
 #!/usr/bin/python3
 from typing import List
 
@@ -19,7 +18,7 @@ from std_msgs.msg import Header
 
 class MoveGroupActionClientNode(Node):
     PLANNING_PIPELINE_ID = "ompl"
-    PLANNER_ID = "RRTConnectkConfigDefault"
+    # Supported planner_id values registered in ompl_planning.yaml:
     PLANNER_ID_OPTIONS = (
         "ESTkConfigDefault",
         "RRTkConfigDefault",
@@ -34,9 +33,23 @@ class MoveGroupActionClientNode(Node):
         "LazyPRMstarkConfigDefault",
         "SPARSkConfigDefault",
     )
+    # Default planner_id. Set this to one of PLANNER_ID_OPTIONS above.
+    PLANNER_ID = "RRTConnectkConfigDefault"
 
     def __init__(self, node_name: str) -> None:
         super().__init__(node_name)
+
+        self.declare_parameter("planning_pipeline_id", self.PLANNING_PIPELINE_ID)
+        self.declare_parameter("planner_id", self.PLANNER_ID)
+        self.planning_pipeline_id = (
+            self.get_parameter("planning_pipeline_id").get_parameter_value().string_value
+        )
+        self.planner_id = self.get_parameter("planner_id").get_parameter_value().string_value
+        if self.planner_id not in self.PLANNER_ID_OPTIONS:
+            raise ValueError(
+                f"Unsupported planner_id '{self.planner_id}'. "
+                f"Available planner_ids: {', '.join(self.PLANNER_ID_OPTIONS)}"
+            )
 
         self.action_server = "/lbr/move_action"
         self.move_group_name = "arm"
@@ -52,7 +65,15 @@ class MoveGroupActionClientNode(Node):
             raise RuntimeError(
                 f"Couldn't connect to action server {self.action_server}."
             )
-        self.get_logger().info(f"Done.")
+        self.get_logger().info("Done.")
+        self.get_logger().info(
+            f"Available OMPL planner_ids: {', '.join(self.PLANNER_ID_OPTIONS)}"
+        )
+        self.get_logger().info(
+            "Configured MoveGroup request defaults with "
+            f"pipeline_id='{self.planning_pipeline_id}', "
+            f"planner_id='{self.planner_id}'"
+        )
 
     def send_goal_async(self, target: Pose):
         goal = MoveGroup.Goal()
@@ -64,7 +85,12 @@ class MoveGroupActionClientNode(Node):
                         header=Header(frame_id=self.base),
                         link_name=self.end_effector,
                         constraint_region=BoundingVolume(
-                            primitives=[SolidPrimitive(type=2, dimensions=[0.0001])],
+                            primitives=[
+                                SolidPrimitive(
+                                    type=SolidPrimitive.SPHERE,
+                                    dimensions=[0.0001],
+                                )
+                            ],
                             primitive_poses=[Pose(position=target.position)],
                         ),
                         weight=1.0,
@@ -87,17 +113,8 @@ class MoveGroupActionClientNode(Node):
         goal.request.max_acceleration_scaling_factor = 0.1
         goal.request.max_velocity_scaling_factor = 0.1
         goal.request.num_planning_attempts = 1
-        goal.request.pipeline_id = self.PLANNING_PIPELINE_ID
-        # planner_id options registered in ompl_planning.yaml:
-        # ESTkConfigDefault, RRTkConfigDefault, RRTConnectkConfigDefault,
-        # RRTstarkConfigDefault, TRRTkConfigDefault, PRMkConfigDefault,
-        # PRMstarkConfigDefault, BiTRRTkConfigDefault, LBTRRTkConfigDefault,
-        # BiESTkConfigDefault, LazyPRMstarkConfigDefault, SPARSkConfigDefault
-        goal.request.planner_id = self.PLANNER_ID
-
-        self.get_logger().info(
-            f"Available OMPL planner_ids: {', '.join(self.PLANNER_ID_OPTIONS)}"
-        )
+        goal.request.pipeline_id = self.planning_pipeline_id
+        goal.request.planner_id = self.planner_id
         self.get_logger().info(
             "Sending MoveGroup goal with "
             f"pipeline_id='{goal.request.pipeline_id}', "
