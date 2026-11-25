@@ -23,11 +23,19 @@ ament_target_dependencies(hello_moveit_action
   rclcpp
 )
 
+add_executable(dual_hello_moveit src/dual_hello_moveit.cpp)
+
+ament_target_dependencies(dual_hello_moveit
+  geometry_msgs
+  moveit_ros_planning_interface
+  rclcpp
+)
+
 install(DIRECTORY launch
   DESTINATION share/${PROJECT_NAME}
 )
 
-install(TARGETS hello_moveit_action
+install(TARGETS hello_moveit_action dual_hello_moveit
   DESTINATION lib/${PROJECT_NAME}
 )
 

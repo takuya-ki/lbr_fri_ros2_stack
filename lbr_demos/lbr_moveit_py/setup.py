@@ -23,6 +23,7 @@ setup(
         "console_scripts": [
             "hello_moveit_action = lbr_moveit_py.hello_moveit_action:main",
             "hello_moveit_commander = lbr_moveit_py.hello_moveit_commander:main",
+            "dual_hello_moveit = lbr_moveit_py.dual_hello_moveit:main",
         ],
     },
 )

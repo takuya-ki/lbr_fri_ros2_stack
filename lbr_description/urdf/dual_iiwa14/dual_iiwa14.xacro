@@ -1,0 +1,295 @@
+<?xml version="1.0"?>
+
+<!-- top level -->
+<robot name="iiwa14" xmlns:xacro="http://www.ros.org/wiki/xacro">
+
+    <!-- include the lbr iiwa macro -->
+    <xacro:include filename="$(find lbr_description)/urdf/dual_iiwa14/dual_iiwa14_description.xacro" />
+
+    <xacro:arg name="mode" default="true" />
+
+    <link name="world" />
+
+    <joint name="world_lbr_right_joint" type="fixed">
+        <origin xyz="0 0 0" rpy="0 0 0"/>
+        <parent link="world"/>
+        <child link="lbr_right_floating_link"/>
+    </joint>
+
+    <joint name="world_lbr_left_joint" type="fixed">
+        <origin xyz="0 0 0" rpy="0 0 0"/>
+        <parent link="world"/>
+        <child link="lbr_left_floating_link"/>
+    </joint>
+
+    <joint name="conveyor_joint" type="fixed">
+        <parent link="world"/>
+        <child link = "conveyor"/>
+        <origin xyz="0.6 1.7 0" rpy="0 0 0"/>
+    </joint>
+
+    <link name="conveyor">
+        <visual>
+            <origin xyz="0 0 0" rpy="0 0 0"/>
+            <geometry>
+                <mesh filename="package://lbr_description/meshes/envs/visual/conveyor.dae"/>
+            </geometry>
+            <material name="gray">
+                <color rgba="0.7 0.7 0.7 0.2"/>
+            </material>
+        </visual>
+        <collision>
+            <origin xyz="0 0 0.455" rpy="0 0 0"/>
+            <geometry>
+                <box size="0.445 3.0 0.91"/>
+            </geometry>
+        </collision>
+        <inertial>
+            <origin xyz="0 0 1" rpy="0 0 0"/>
+            <mass value="1"/>
+            <inertia
+                ixx="1.0" ixy="0.0" ixz="0.0"
+                iyy="1.0" iyz="0.0"
+                izz="1.0"/>
+        </inertial>
+    </link>
+
+    <joint name="tv_joint" type="fixed">
+        <parent link="world"/>
+        <child link = "tv"/>
+        <origin xyz="0.6 -0.5 1.9" rpy="-0.1745 0 0.78"/>
+    </joint>
+
+    <link name="tv">
+        <visual>
+            <origin xyz="0 0 0" rpy="0 0 0"/>
+            <geometry>
+                <box size="1.1 0.1 0.6"/>
+            </geometry>
+            <material name="gray">
+                <color rgba="0.7 0.7 0.7 0.2"/>
+            </material>
+        </visual>  
+        <collision>
+            <origin xyz="0 0 0" rpy="0 0 0"/>
+            <geometry>
+                <box size="1.1 0.1 0.6"/>
+            </geometry>
+        </collision>
+        <inertial>
+            <origin xyz="0 0 1" rpy="0 0 0"/>
+            <mass value="1"/>
+            <inertia
+                ixx="1.0" ixy="0.0" ixz="0.0"
+                iyy="1.0" iyz="0.0"
+                izz="1.0"/>
+        </inertial>
+    </link>
+
+    <joint name="frame_joint" type="fixed">
+        <parent link="world"/>
+        <child link = "frame"/>
+        <origin xyz="-0.2 0.8 0.84" rpy="0 0 0"/>
+    </joint>
+
+    <link name="frame">
+        <visual>
+            <origin xyz="0 0 0" rpy="0 0 0"/>
+            <geometry>
+                <mesh filename="package://lbr_description/meshes/envs/visual/workspace.stl"/>
+            </geometry>
+            <material name="gray">
+                <color rgba="0.7 0.7 0.7 0.2"/>
+            </material>
+        </visual>  
+        <collision>
+            <origin xyz="0 0 -0.4" rpy="0 0 0"/>
+            <geometry>
+                <box size="1.0 1.0 0.7"/>
+            </geometry>
+        </collision>
+        <inertial>
+            <origin xyz="0 0 1" rpy="0 0 0"/>
+            <mass value="1"/>
+            <inertia
+                ixx="1.0" ixy="0.0" ixz="0.0"
+                iyy="1.0" iyz="0.0"
+                izz="1.0"/>
+        </inertial>
+    </link>
+
+    <joint name="softjig_joint" type="fixed">
+        <parent link="frame"/>
+        <child link = "softjig"/>
+        <origin xyz="0.45 0.5 0" rpy="1.57 0 3.14"/>
+    </joint>
+
+    <link name="softjig">
+        <visual>
+            <origin xyz="0 0 0" rpy="0 0 0"/>
+            <geometry>
+                <mesh filename="package://lbr_description/meshes/envs/visual/softjig.stl"/>
+            </geometry>
+            <material name="dark_gray">
+                <color rgba="0.7 0.7 0.7 1.0"/>
+            </material>
+        </visual>  
+        <collision>
+            <origin xyz="0 0 0" rpy="0 0 0"/>
+            <geometry>
+                <mesh filename="package://lbr_description/meshes/envs/collision/softjig.stl"/>
+            </geometry>
+        </collision>
+        <inertial>
+            <origin xyz="0 0 1" rpy="0 0 0"/>
+            <mass value="1"/>
+            <inertia
+                ixx="1.0" ixy="0.0" ixz="0.0"
+                iyy="1.0" iyz="0.0"
+                izz="1.0"/>
+        </inertial>
+    </link>
+
+    <joint name="round_table_joint" type="fixed">
+        <parent link="world"/>
+        <child link = "round_table"/>
+        <origin xyz="0 -0.3 0.55" rpy="0 0 0"/>
+    </joint>
+
+    <link name="round_table">
+        <visual>
+            <origin xyz="0 0 0" rpy="0 0 0"/>
+            <geometry>
+                <cylinder length="0.05" radius="0.43"/>
+            </geometry>
+            <material name="green">
+                <color rgba="0.0 0.8 0.0 0.5"/>
+            </material>
+        </visual>
+        <collision>
+            <origin xyz="0 0 0" rpy="0 0 0"/>
+            <geometry>
+                <cylinder length="0.05" radius="0.43"/>
+            </geometry>
+        </collision>
+        <inertial>
+            <origin xyz="0 0 1" rpy="0 0 0"/>
+            <mass value="1"/>
+            <inertia
+                ixx="1.0" ixy="0.0" ixz="0.0"
+                iyy="1.0" iyz="0.0"
+                izz="1.0"/>
+        </inertial>
+    </link>
+
+    <joint name="heater_unit_joint" type="fixed">
+        <parent link="conveyor"/>
+        <child link = "heater_unit"/>
+        <origin xyz="0.242 -1.4 0.8" rpy="0 0 1.57"/>
+    </joint>
+
+    <link name="heater_unit">
+        <visual>
+            <origin xyz="0 0 0" rpy="0 0 0"/>
+            <geometry>
+                <mesh filename="package://lbr_description/meshes/envs/visual/heater_unit.stl"/>
+            </geometry>
+            <material name="gray">
+                <color rgba="0.7 0.7 0.7 0.2"/>
+            </material>
+        </visual>  
+        <collision>
+            <origin xyz="0 0.25 0.32" rpy="0 0 0"/>
+            <geometry>
+                <box size="0.22 0.445 0.4"/>
+            </geometry>
+        </collision>
+        <inertial>
+            <origin xyz="0 0 1" rpy="0 0 0"/>
+            <mass value="1"/>
+            <inertia
+                ixx="1.0" ixy="0.0" ixz="0.0"
+                iyy="1.0" iyz="0.0"
+                izz="1.0"/>
+        </inertial>
+    </link>
+
+    <!-- KDL requires a link without inertia -->
+    <link name="lbr_right_floating_link" />
+
+    <link name="workspace_mount_right">
+        <visual>
+            <origin xyz="0 0 0" rpy="0 0 0"/>
+            <geometry>
+                <box size="0.3 0.3 0.03"/>
+            </geometry>
+            <material name="gray">
+                <color rgba="0.7 0.7 0.7 0.2"/>
+            </material>
+        </visual>
+        <collision>
+            <origin xyz="0 0 0" rpy="0 0 0"/>
+            <geometry>
+                <box size="0.3 0.3 0.03"/>
+            </geometry>
+        </collision>
+    </link>
+
+    <joint name="workspace_mount_right_joint" type="fixed">
+        <origin xyz="-0.5 0.5 0.85" rpy="0 0 3.14"/>
+        <parent link="lbr_right_floating_link"/>
+        <child link="workspace_mount_right"/>
+    </joint>
+
+    <joint name="lbr_right_joint" type="fixed">
+        <origin xyz="0 0 0.016" rpy="0 0 0.785398"/>
+        <parent link="workspace_mount_right" />
+        <child link="lbr_right_link_0" />
+    </joint>
+
+    <!-- iiwa -->
+    <xacro:iiwa14
+        robot_name="lbr_right"
+        mode="$(arg mode)"
+        system_config_path="$(find lbr_description)/ros2_control/lbr_right_system_config.yaml" />
+
+    <!-- KDL requires a link without inertia -->
+    <link name="lbr_left_floating_link" />
+
+    <link name="workspace_mount_left">
+        <visual>
+            <origin xyz="0 0 0" rpy="0 0 0"/>
+            <geometry>
+                <box size="0.3 0.3 0.03"/>
+            </geometry>
+            <material name="gray">
+                <color rgba="0.7 0.7 0.7 0.2"/>
+            </material>
+        </visual>
+        <collision>
+            <origin xyz="0 0 0" rpy="0 0 0"/>
+            <geometry>
+                <box size="0.3 0.3 0.03"/>
+            </geometry>
+        </collision>
+    </link>
+
+    <joint name="workspace_mount_left_joint" type="fixed">
+        <origin xyz="0.1 0.5 0.85" rpy="0 0 3.14"/>
+        <parent link="lbr_left_floating_link"/>
+        <child link="workspace_mount_left"/>
+    </joint>
+
+    <joint name="lbr_left_joint" type="fixed">
+        <origin xyz="0 0 0.016" rpy="0 0 2.36"/>
+        <parent link="workspace_mount_left" />
+        <child link="lbr_left_link_0" />
+    </joint>
+
+    <!-- iiwa -->
+    <xacro:iiwa14
+        robot_name="lbr_left"
+        mode="$(arg mode)"
+        system_config_path="$(find lbr_description)/ros2_control/lbr_left_system_config.yaml" />
+
+</robot>

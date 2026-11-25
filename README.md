@@ -84,6 +84,18 @@ Full documentation available on [Read the Docs](https://lbr-stack.readthedocs.io
 
 Now, run the [demos](https://lbr-stack.readthedocs.io/en/latest/lbr_fri_ros2_stack/lbr_demos/doc/lbr_demos.html). To get started with the real robot, checkout the [Hardware Setup](https://lbr-stack.readthedocs.io/en/latest/lbr_fri_ros2_stack/lbr_fri_ros2_stack/doc/hardware_setup.html).
 
+## Dual-arm LBR iiwa 14
+
+The dual-arm configuration (`dual_iiwa14`) from the former `dual_lbr_fri_ros2_stack` repository is included. Single-arm files are unchanged; dual-arm files are prefixed with `dual_`.
+
+```shell
+ros2 launch lbr_bringup dual_mock.launch.py model:=dual_iiwa14
+ros2 launch lbr_bringup dual_move_group.launch.py mode:=mock model:=dual_iiwa14 rviz:=true
+ros2 launch lbr_moveit_cpp dual_hello_moveit.launch.py mode:=mock model:=dual_iiwa14  # or lbr_moveit_py
+```
+
+`dual_hardware.launch.py` is still work in progress.
+
 ## Citation
 If you enjoyed using this repository for your work, we would really appreciate ❤️ if you could leave a ⭐ and / or cite it, as it helps us to continue offering support.
 

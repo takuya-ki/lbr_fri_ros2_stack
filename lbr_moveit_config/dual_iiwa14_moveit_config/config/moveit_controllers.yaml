@@ -1,0 +1,33 @@
+
+moveit_controller_manager: moveit_simple_controller_manager/MoveItSimpleControllerManager
+
+moveit_simple_controller_manager:
+  controller_names:
+    - /lbr_right/right_joint_trajectory_controller
+    - /lbr_left/left_joint_trajectory_controller
+
+  /lbr_right/right_joint_trajectory_controller:
+    type: FollowJointTrajectory
+    joints:
+      - lbr_right_A1
+      - lbr_right_A2
+      - lbr_right_A3
+      - lbr_right_A4
+      - lbr_right_A5
+      - lbr_right_A6
+      - lbr_right_A7
+    action_ns: follow_joint_trajectory
+    default: true
+
+  /lbr_left/left_joint_trajectory_controller:
+    type: FollowJointTrajectory
+    joints:
+      - lbr_left_A1
+      - lbr_left_A2
+      - lbr_left_A3
+      - lbr_left_A4
+      - lbr_left_A5
+      - lbr_left_A6
+      - lbr_left_A7
+    action_ns: follow_joint_trajectory
+    default: true

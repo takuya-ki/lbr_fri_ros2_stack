@@ -1,0 +1,121 @@
+# Use of /** so that the configurations hold for controller
+# managers regardless of their namespace. Usefull in multi-robot setups.
+/**/controller_manager:
+  ros__parameters:
+    update_rate: 100
+
+    # ROS 2 control broadcasters
+    left_force_torque_broadcaster:
+      type: force_torque_sensor_broadcaster/ForceTorqueSensorBroadcaster
+
+    # LBR ROS 2 control broadcasters
+    left_lbr_state_broadcaster:
+      type: lbr_ros2_control/LBRStateBroadcaster
+
+    # ROS 2 control controllers
+    left_joint_trajectory_controller:
+      type: joint_trajectory_controller/JointTrajectoryController
+
+    left_forward_position_controller:
+      type: position_controllers/JointGroupPositionController
+
+    # LBR ROS 2 control controllers
+    left_admittance_controller:
+      type: lbr_ros2_control/AdmittanceController
+
+    lbr_left_joint_position_command_controller:
+      type: lbr_ros2_control/LBRJointPositionCommandController
+
+    lbr_left_torque_command_controller:
+      type: lbr_ros2_control/LBRTorqueCommandController
+
+    lbr_left_wrench_command_controller:
+      type: lbr_ros2_control/LBRWrenchCommandController
+
+    left_twist_controller:
+      type: lbr_ros2_control/TwistController
+
+# ROS 2 control broadcasters
+/**/left_force_torque_broadcaster:
+  ros__parameters:
+    frame_id: lbr_left_link_ee # namespace: https://github.com/ros2/rviz/issues/1103
+    sensor_name: left_estimated_ft_sensor
+
+# LBR ROS 2 control broadcasters
+/**/left_lbr_state_broadcaster:
+  ros__parameters:
+    robot_name: lbr_left
+
+# ROS 2 control controllers
+/**/left_joint_trajectory_controller:
+  ros__parameters:
+    joints:
+      - lbr_left_A1
+      - lbr_left_A2
+      - lbr_left_A3
+      - lbr_left_A4
+      - lbr_left_A5
+      - lbr_left_A6
+      - lbr_left_A7
+    command_interfaces:
+      - position
+    state_interfaces:
+      - position
+      - velocity
+    state_publish_rate: 50.0
+    action_monitor_rate: 20.0
+
+/**/left_forward_position_controller:
+  ros__parameters:
+    joints:
+      - lbr_left_A1
+      - lbr_left_A2
+      - lbr_left_A3
+      - lbr_left_A4
+      - lbr_left_A5
+      - lbr_left_A6
+      - lbr_left_A7
+    interface_name: position
+
+# LBR ROS 2 control controllers
+/**/lbr_left_joint_position_command_controller:
+  ros__parameters:
+    robot_name: lbr_left
+
+/**/lbr_left_torque_command_controller:
+  ros__parameters:
+    robot_name: lbr_left
+
+/**/lbr_left_wrench_command_controller:
+  ros__parameters:
+    robot_name: lbr_left
+
+/**/left_admittance_controller:
+  ros__parameters:
+    robot_name: lbr_left
+    admittance:
+      mass: [0.01, 0.01, 0.01, 0.01, 0.01, 0.01]
+      damping: [1.0, 1.0, 1.0, 1.0, 1.0, 1.0]
+      stiffness: [0.0, 0.0, 0.0, 0.0, 0.0, 0.0]
+    inv_jac_ctrl:
+      chain_root: lbr_left_link_0
+      chain_tip: lbr_left_link_ee
+      damping: 0.2 # damping factor for the pseudo-inverse of the Jacobian
+      max_linear_velocity: 2.0 # maximum linear velocity
+      max_angular_velocity: 2.0 # maximum linear acceleration
+      joint_gains: [1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0] # joint gains
+      cartesian_gains: [1.0, 1.0, 1.0, 1.0, 1.0, 1.0] # cartesian gains
+
+/**/left_twist_controller:
+  ros__parameters:
+    robot_name: lbr_left
+    inv_jac_ctrl:
+      chain_root: lbr_left_link_0
+      chain_tip: lbr_left_link_ee
+      twist_in_tip_frame: true # if true, the twist command is expressed in the tip frame, otherwise in the root frame
+      damping: 0.2 # damping factor for the pseudo-inverse of the Jacobian
+      max_linear_velocity: 0.1 # maximum linear velocity
+      max_angular_velocity: 0.1 # maximum linear acceleration
+      joint_gains: [1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0] # joint gains
+      cartesian_gains: [1.0, 1.0, 1.0, 1.0, 1.0, 1.0] # cartesian gains
+    timeout: 0.2 # stop controller if no command is received within this time [s]
