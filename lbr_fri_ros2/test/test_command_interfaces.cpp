@@ -19,7 +19,7 @@ class TestCommandInterfaces : public ::testing::Test {
 public:
   TestCommandInterfaces() : random_engine_(std::random_device{}()) {
     cmd_guard_params_ = lbr_fri_ros2::CommandGuardParameters();
-    state_interface_params_ = lbr_fri_ros2::StateInterfaceParameters();
+    state_interface_params_ = lbr_fri_ros2::StateInterfaceParameters{0.04, 0.04};
 
     state_interface_ = std::make_shared<lbr_fri_ros2::StateInterface>(state_interface_params_);
 

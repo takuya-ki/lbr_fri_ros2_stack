@@ -34,4 +34,5 @@ MoveIt
 
 Integration
 -----------
-TODO system integration demos
+The MoveIt C++ and Python action demos cover planning and execution against the
+mock or hardware bringup.

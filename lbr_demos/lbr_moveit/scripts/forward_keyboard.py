@@ -10,4 +10,7 @@ def main():
         with KeyboardListener(forward_keyboard_node):
             rclpy.spin(forward_keyboard_node)
     except KeyboardInterrupt:
-        pass
+        forward_keyboard_node.get_logger().info("Keyboard interrupt received.")
+    finally:
+        forward_keyboard_node.destroy_node()
+        rclpy.shutdown()

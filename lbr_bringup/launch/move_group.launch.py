@@ -80,6 +80,10 @@ def hidden_setup(context: LaunchContext) -> List[LaunchDescriptionEntity]:
                 PathJoinSubstitution([robot_name, "recognized_object_array"]),
             ),
         ],
+        ros_arguments=[
+            "--log-level",
+            "moveit_ros_visualization.motion_planning_frame:=fatal",
+        ],
         condition=IfCondition(LaunchConfiguration("rviz")),
     )
 

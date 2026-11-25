@@ -1,4 +1,4 @@
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 
 import numpy as np
 import rclpy
@@ -11,7 +11,7 @@ from sensor_msgs.msg import JointState
 
 class ForwardKeyboardNode(Node):
     @dataclass
-    class VeloctiyScales:
+    class VelocityScales:
         @dataclass
         class Translation:
             x: float = 0.0
@@ -25,8 +25,8 @@ class ForwardKeyboardNode(Node):
             z: float = 0.0
 
         joints: list
-        translation: Translation = Translation()
-        rotation: Rotation = Rotation()
+        translation: Translation = field(default_factory=Translation)
+        rotation: Rotation = field(default_factory=Rotation)
 
     @dataclass
     class KeyboardLayout:
@@ -73,8 +73,8 @@ class ForwardKeyboardNode(Node):
             z: Z = Z()
 
         joints: list
-        translation: Translation = Translation()
-        rotation: Rotation = Rotation()
+        translation: Translation = field(default_factory=Translation)
+        rotation: Rotation = field(default_factory=Rotation)
         escape: str = "Key.esc"
         pause: str = "p"
         reverse_joints: str = "r"
@@ -105,7 +105,7 @@ class ForwardKeyboardNode(Node):
                 f"Waiting for joint state on {self._joint_state_sub.topic_name}..."
             )
             rclpy.spin_once(self, timeout_sec=1.0)
-        self._veloctiy_scales = self.VeloctiyScales(joints=[0.0] * self._dof)
+        self._velocity_scales = self.VelocityScales(joints=[0.0] * self._dof)
         self._keyboard_layout = self.KeyboardLayout(
             joints=[str(i) for i in range(self._dof)]
         )
@@ -138,7 +138,7 @@ class ForwardKeyboardNode(Node):
         return self._keyboard_layout
 
     def _declare_parameters(self):
-        # veloctiy scales
+        # velocity scales
         self.declare_parameters(
             namespace="",
             parameters=[
@@ -176,43 +176,43 @@ class ForwardKeyboardNode(Node):
         )
 
     def _get_parameters(self):
-        # veloctiy scales
-        self._veloctiy_scales.joints = (
+        # velocity scales
+        self._velocity_scales.joints = (
             self.get_parameter("velocity_scales.joints")
             .get_parameter_value()
             .double_array_value
         )
-        if len(self._veloctiy_scales.joints) != self._dof:
+        if len(self._velocity_scales.joints) != self._dof:
             raise ValueError(
-                f"Number of joint velocity scales ({len(self._veloctiy_scales.joints)}) "
+                f"Number of joint velocity scales ({len(self._velocity_scales.joints)}) "
                 f"does not match the number of joints ({self._dof})."
             )
-        self._veloctiy_scales.translation.x = (
+        self._velocity_scales.translation.x = (
             self.get_parameter("velocity_scales.translation.x")
             .get_parameter_value()
             .double_value
         )
-        self._veloctiy_scales.translation.y = (
+        self._velocity_scales.translation.y = (
             self.get_parameter("velocity_scales.translation.y")
             .get_parameter_value()
             .double_value
         )
-        self._veloctiy_scales.translation.z = (
+        self._velocity_scales.translation.z = (
             self.get_parameter("velocity_scales.translation.z")
             .get_parameter_value()
             .double_value
         )
-        self._veloctiy_scales.rotation.x = (
+        self._velocity_scales.rotation.x = (
             self.get_parameter("velocity_scales.rotation.x")
             .get_parameter_value()
             .double_value
         )
-        self._veloctiy_scales.rotation.y = (
+        self._velocity_scales.rotation.y = (
             self.get_parameter("velocity_scales.rotation.y")
             .get_parameter_value()
             .double_value
         )
-        self._veloctiy_scales.rotation.z = (
+        self._velocity_scales.rotation.z = (
             self.get_parameter("velocity_scales.rotation.z")
             .get_parameter_value()
             .double_value
@@ -301,39 +301,45 @@ class ForwardKeyboardNode(Node):
         )
 
         self.get_logger().info("Parameters:")
-        # veloctiy scales
+        # velocity scales
         self.get_logger().info("  Velocity Scales:")
         self.get_logger().info("    Translation:")
-        self.get_logger().info(f"      x: {self._veloctiy_scales.translation.x}")
-        self.get_logger().info(f"      y: {self._veloctiy_scales.translation.y}")
-        self.get_logger().info(f"      z: {self._veloctiy_scales.translation.z}")
+        self.get_logger().info(f"      x: {self._velocity_scales.translation.x}")
+        self.get_logger().info(f"      y: {self._velocity_scales.translation.y}")
+        self.get_logger().info(f"      z: {self._velocity_scales.translation.z}")
         self.get_logger().info("    Rotation:")
-        self.get_logger().info(f"      x: {self._veloctiy_scales.rotation.x}")
-        self.get_logger().info(f"      y: {self._veloctiy_scales.rotation.y}")
-        self.get_logger().info(f"      z: {self._veloctiy_scales.rotation.z}")
-        self.get_logger().info(f"    Joints: {self._veloctiy_scales.joints.tolist()}")
+        self.get_logger().info(f"      x: {self._velocity_scales.rotation.x}")
+        self.get_logger().info(f"      y: {self._velocity_scales.rotation.y}")
+        self.get_logger().info(f"      z: {self._velocity_scales.rotation.z}")
+        self.get_logger().info(f"    Joints: {self._velocity_scales.joints.tolist()}")
 
         # keyboard layout
         self.get_logger().info("  Keyboard Layout:")
         self.get_logger().info("    Translation:")
         self.get_logger().info(
-            f"      x: {self._keyboard_layout.translation.x.increase} / {self._keyboard_layout.translation.x.decrease}"
+            f"      x: {self._keyboard_layout.translation.x.increase} / "
+            f"{self._keyboard_layout.translation.x.decrease}"
         )
         self.get_logger().info(
-            f"      y: {self._keyboard_layout.translation.y.increase} / {self._keyboard_layout.translation.y.decrease}"
+            f"      y: {self._keyboard_layout.translation.y.increase} / "
+            f"{self._keyboard_layout.translation.y.decrease}"
         )
         self.get_logger().info(
-            f"      z: {self._keyboard_layout.translation.z.increase} / {self._keyboard_layout.translation.z.decrease}"
+            f"      z: {self._keyboard_layout.translation.z.increase} / "
+            f"{self._keyboard_layout.translation.z.decrease}"
         )
         self.get_logger().info("    Rotation:")
         self.get_logger().info(
-            f"      x: {self._keyboard_layout.rotation.x.increase} / {self._keyboard_layout.rotation.x.decrease}"
+            f"      x: {self._keyboard_layout.rotation.x.increase} / "
+            f"{self._keyboard_layout.rotation.x.decrease}"
         )
         self.get_logger().info(
-            f"      y: {self._keyboard_layout.rotation.y.increase} / {self._keyboard_layout.rotation.y.decrease}"
+            f"      y: {self._keyboard_layout.rotation.y.increase} / "
+            f"{self._keyboard_layout.rotation.y.decrease}"
         )
         self.get_logger().info(
-            f"      z: {self._keyboard_layout.rotation.z.increase} / {self._keyboard_layout.rotation.z.decrease}"
+            f"      z: {self._keyboard_layout.rotation.z.increase} / "
+            f"{self._keyboard_layout.rotation.z.decrease}"
         )
         self.get_logger().info(f"    Joints: {self._keyboard_layout.joints}")
         self.get_logger().info(f"    Escape: {self._keyboard_layout.escape}")
@@ -352,19 +358,19 @@ class ForwardKeyboardNode(Node):
     def twist_cmd(self, twist: np.ndarray) -> None:
         if len(twist) != 6:
             raise ValueError("Twist command must be a 6-element array.")
-        self._twist_cmd.twist.linear.x = twist[0] * self._veloctiy_scales.translation.x
-        self._twist_cmd.twist.linear.y = twist[1] * self._veloctiy_scales.translation.y
-        self._twist_cmd.twist.linear.z = twist[2] * self._veloctiy_scales.translation.z
-        self._twist_cmd.twist.angular.x = twist[3] * self._veloctiy_scales.rotation.x
-        self._twist_cmd.twist.angular.y = twist[4] * self._veloctiy_scales.rotation.y
-        self._twist_cmd.twist.angular.z = twist[5] * self._veloctiy_scales.rotation.z
+        self._twist_cmd.twist.linear.x = twist[0] * self._velocity_scales.translation.x
+        self._twist_cmd.twist.linear.y = twist[1] * self._velocity_scales.translation.y
+        self._twist_cmd.twist.linear.z = twist[2] * self._velocity_scales.translation.z
+        self._twist_cmd.twist.angular.x = twist[3] * self._velocity_scales.rotation.x
+        self._twist_cmd.twist.angular.y = twist[4] * self._velocity_scales.rotation.y
+        self._twist_cmd.twist.angular.z = twist[5] * self._velocity_scales.rotation.z
 
     @property
-    def joint_veloctiy_cmd(self) -> np.ndarray:
+    def joint_velocity_cmd(self) -> np.ndarray:
         return np.array(self._joint_cmd.velocities)
 
-    @joint_veloctiy_cmd.setter
-    def joint_veloctiy_cmd(self, velocities: np.ndarray) -> None:
+    @joint_velocity_cmd.setter
+    def joint_velocity_cmd(self, velocities: np.ndarray) -> None:
         if not self._joint_state:
             return
         if len(velocities) != self._dof:
@@ -376,7 +382,7 @@ class ForwardKeyboardNode(Node):
         self._joint_cmd.velocities = velocities[index_map].tolist()
         self._joint_cmd.velocities = [
             v * s
-            for v, s in zip(self._joint_cmd.velocities, self._veloctiy_scales.joints)
+            for v, s in zip(self._joint_cmd.velocities, self._velocity_scales.joints)
         ]
 
     def _on_joint_state(self, msg: JointState):

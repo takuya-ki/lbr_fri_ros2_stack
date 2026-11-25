@@ -18,7 +18,7 @@ find_package(rclcpp REQUIRED)
 add_executable(hello_moveit_action src/hello_moveit_action.cpp)
 
 ament_target_dependencies(hello_moveit_action
-  geometry_msgs  
+  geometry_msgs
   moveit_ros_planning_interface
   rclcpp
 )

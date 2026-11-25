@@ -1,7 +1,7 @@
 from typing import List
 
 from launch import LaunchContext, LaunchDescription, LaunchDescriptionEntity
-from launch.actions import OpaqueFunction
+from launch.actions import DeclareLaunchArgument, OpaqueFunction
 from launch.substitutions import LaunchConfiguration
 from launch_ros.actions import Node
 from lbr_bringup.description import LBRDescriptionMixin
@@ -31,6 +31,10 @@ def hidden_setup(context: LaunchContext) -> List[LaunchDescriptionEntity]:
             parameters=[
                 moveit_configs.to_dict(),
                 {"use_sim_time": use_sim_time},
+                {
+                    "planning_pipeline_id": LaunchConfiguration("planning_pipeline_id"),
+                    "planner_id": LaunchConfiguration("planner_id"),
+                },
                 LBRDescriptionMixin.param_robot_name(),
             ],
         )
@@ -43,6 +47,18 @@ def generate_launch_description() -> LaunchDescription:
 
     ld.add_action(LBRDescriptionMixin.arg_model())
     ld.add_action(LBRDescriptionMixin.arg_mode())
+    ld.add_action(
+        DeclareLaunchArgument(
+            name="planning_pipeline_id",
+            default_value="ompl",
+        )
+    )
+    ld.add_action(
+        DeclareLaunchArgument(
+            name="planner_id",
+            default_value="RRTConnectkConfigDefault",
+        )
+    )
 
     ld.add_action(OpaqueFunction(function=hidden_setup))
 
